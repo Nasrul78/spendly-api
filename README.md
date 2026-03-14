@@ -33,6 +33,7 @@ spendly/
 ├── cmd/
 │   └── api/
 │       └── main.go
+├── .air.toml
 ├── .env
 ├── .env.example
 ├── .gitignore
