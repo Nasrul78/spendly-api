@@ -6,8 +6,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nasrul78/spendly-api/config"
+	"github.com/nasrul78/spendly-api/internal/handler"
+	"github.com/nasrul78/spendly-api/internal/middleware"
+	"github.com/nasrul78/spendly-api/internal/repository"
+	"github.com/nasrul78/spendly-api/internal/service"
 )
 
 func main() {
@@ -29,12 +35,31 @@ func main() {
 	}
 	log.Println("successfully connected to database")
 
-	mux := http.NewServeMux()
+	userRepo := repository.NewUserRepository(pool)
+
+	authService := service.NewAuthService(userRepo, cfg)
+
+	authHandler := handler.NewAuthHandler(authService)
+
+	r := chi.NewRouter()
+	r.Use(chimiddleware.Logger)
+	r.Use(chimiddleware.Recoverer)
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/register", authHandler.Register)
+			r.Post("/login", authHandler.Login)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.Auth(cfg.JWTSecret))
+			//
+		})
+	})
 
 	addr := ":" + cfg.AppPort
-
-	log.Printf("server running on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	log.Printf("starting server on %s", addr)
+	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }
