@@ -25,3 +25,17 @@ Designed with clean architecture principles, Spendly separates concerns across h
 | Container | Docker + docker-compose |
 
 ---
+
+## Project Structure
+
+```
+spendly/
+├── cmd/
+│   └── api/
+│       └── main.go
+├── .env
+├── .env.example
+├── .gitignore
+├── go.mod
+├── go.sum
+└── README.md
