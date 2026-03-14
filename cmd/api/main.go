@@ -36,10 +36,13 @@ func main() {
 	log.Println("successfully connected to database")
 
 	userRepo := repository.NewUserRepository(pool)
+	categoryRepo := repository.NewCategoryRepository(pool)
 
 	authService := service.NewAuthService(userRepo, cfg)
+	categoryService := service.NewCategoryService(categoryRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	r := chi.NewRouter()
 	r.Use(chimiddleware.Logger)
@@ -53,7 +56,14 @@ func main() {
 
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Auth(cfg.JWTSecret))
-			//
+
+			r.Route("/categories", func(r chi.Router) {
+				r.Post("/", categoryHandler.Create)
+				r.Get("/", categoryHandler.GetAll)
+				r.Get("/{id}", categoryHandler.GetByID)
+				r.Put("/{id}", categoryHandler.Update)
+				r.Delete("/{id}", categoryHandler.Delete)
+			})
 		})
 	})
 
