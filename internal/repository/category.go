@@ -25,7 +25,7 @@ func (r *CategoryRepository) Create(ctx context.Context, userID, name string) (*
 		Name:   name,
 	})
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
 	return &category, nil
 }
@@ -42,7 +42,7 @@ func (r *CategoryRepository) GetByID(ctx context.Context, userID, categoryID str
 		ID:     cid,
 	})
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
 	return &category, nil
 }
@@ -51,7 +51,11 @@ func (r *CategoryRepository) GetAllByUserID(ctx context.Context, userID string) 
 	uid := pgtype.UUID{}
 	uid.Scan(userID)
 
-	return r.queries.GetCategoriesByUserID(ctx, uid)
+	categories, err := r.queries.GetCategoriesByUserID(ctx, uid)
+	if err != nil {
+		return nil, MapError(err)
+	}
+	return categories, nil
 }
 
 func (r *CategoryRepository) Update(ctx context.Context, userID, categoryID, name string) (*db.Category, error) {
@@ -67,7 +71,7 @@ func (r *CategoryRepository) Update(ctx context.Context, userID, categoryID, nam
 		UserID: uid,
 	})
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
 	return &category, nil
 }
@@ -79,8 +83,9 @@ func (r *CategoryRepository) Delete(ctx context.Context, userID, categoryID stri
 	cid := pgtype.UUID{}
 	cid.Scan(categoryID)
 
-	return r.queries.DeleteCategory(ctx, db.DeleteCategoryParams{
+	err := r.queries.DeleteCategory(ctx, db.DeleteCategoryParams{
 		ID:     cid,
 		UserID: uid,
 	})
+	return MapError(err)
 }

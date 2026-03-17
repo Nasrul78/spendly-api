@@ -36,7 +36,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.authService.Register(r.Context(), &req)
 	if err != nil {
-		writeError(w, http.StatusConflict, err.Error())
+		handleError(w, err)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	res, err := h.authService.Login(r.Context(), &req)
 	if err != nil {
-		writeError(w, http.StatusUnauthorized, err.Error())
+		handleError(w, err)
 		return
 	}
 

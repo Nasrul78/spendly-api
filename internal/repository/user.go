@@ -23,23 +23,26 @@ func (r *UserRepository) Create(ctx context.Context, name, email, password strin
 		Password: password,
 	})
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
+
 	return &user, nil
 }
 
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*db.User, error) {
 	user, err := r.queries.GetUserByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
+
 	return &user, nil
 }
 
 func (r *UserRepository) GetByID(ctx context.Context, id string) (*db.User, error) {
 	user, err := r.queries.GetUserByID(ctx, pgtype.UUID{})
 	if err != nil {
-		return nil, err
+		return nil, MapError(err)
 	}
+
 	return &user, nil
 }

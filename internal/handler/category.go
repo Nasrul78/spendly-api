@@ -40,7 +40,7 @@ func (h *CategoryHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	category, err := h.categoryService.Create(r.Context(), UserID, &req)
 	if err != nil {
-		writeError(w, http.StatusConflict, err.Error())
+		handleError(w, err)
 		return
 	}
 
@@ -52,7 +52,7 @@ func (h *CategoryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	categories, err := h.categoryService.GetAll(r.Context(), UserID)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to fetch categories")
+		handleError(w, err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (h *CategoryHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	category, err := h.categoryService.GetByID(r.Context(), UserID, categoryID)
 	if err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
+		handleError(w, err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	category, err := h.categoryService.Update(r.Context(), UserID, categoryID, &req)
 	if err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
+		handleError(w, err)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (h *CategoryHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	categoryID := chi.URLParam(r, "id")
 
 	if err := h.categoryService.Delete(r.Context(), UserID, categoryID); err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
+		handleError(w, err)
 		return
 	}
 

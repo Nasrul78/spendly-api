@@ -16,6 +16,17 @@ type Category struct {
 	UpdatedAt pgtype.Timestamp
 }
 
+type Expense struct {
+	ID         pgtype.UUID
+	UserID     pgtype.UUID
+	CategoryID pgtype.UUID
+	Amount     int64
+	Note       pgtype.Text
+	Date       pgtype.Date
+	CreatedAt  pgtype.Timestamp
+	UpdatedAt  pgtype.Timestamp
+}
+
 type User struct {
 	ID        pgtype.UUID
 	Name      string

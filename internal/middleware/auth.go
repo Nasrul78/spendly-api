@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/nasrul78/spendly-api/internal/domain"
 )
 
 type contextKey string
@@ -17,7 +18,9 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if !strings.HasPrefix(authHeader, "Bearer ") {
-				http.Error(w, `{"message": "unauthorized"}`, http.StatusUnauthorized)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"message":"` + domain.ErrUnauthorized.Error() + `"}`))
 				return
 			}
 
@@ -25,14 +28,19 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 			token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (any, error) {
 				return []byte(jwtSecret), nil
 			})
+
 			if err != nil || !token.Valid {
-				http.Error(w, `{"message": "unauthorized"}`, http.StatusUnauthorized)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"message":"` + domain.ErrUnauthorized.Error() + `"}`))
 				return
 			}
 
 			claims, ok := token.Claims.(jwt.MapClaims)
 			if !ok {
-				http.Error(w, `{"message": "unauthorized"}`, http.StatusUnauthorized)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"message":"` + domain.ErrUnauthorized.Error() + `"}`))
 				return
 			}
 

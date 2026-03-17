@@ -37,12 +37,15 @@ func main() {
 
 	userRepo := repository.NewUserRepository(pool)
 	categoryRepo := repository.NewCategoryRepository(pool)
+	expenseRepo := repository.NewExpenseRepository(pool)
 
 	authService := service.NewAuthService(userRepo, cfg)
 	categoryService := service.NewCategoryService(categoryRepo)
+	expenseService := service.NewExpenseService(expenseRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
+	expenseHandler := handler.NewExpenseHandler(expenseService)
 
 	r := chi.NewRouter()
 	r.Use(chimiddleware.Logger)
@@ -63,6 +66,15 @@ func main() {
 				r.Get("/{id}", categoryHandler.GetByID)
 				r.Put("/{id}", categoryHandler.Update)
 				r.Delete("/{id}", categoryHandler.Delete)
+			})
+
+			r.Route("/expenses", func(r chi.Router) {
+				r.Get("/summary", expenseHandler.GetSummaryByUserID)
+				r.Post("/", expenseHandler.Create)
+				r.Get("/", expenseHandler.GetAll)
+				r.Get("/{id}", expenseHandler.GetByID)
+				r.Put("/{id}", expenseHandler.Update)
+				r.Delete("/{id}", expenseHandler.Delete)
 			})
 		})
 	})
