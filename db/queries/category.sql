@@ -18,6 +18,6 @@ SET name = $1, updated_at = NOW()
 WHERE id = $2 AND user_id = $3
 RETURNING *;
 
--- name: DeleteCategory :exec
+-- name: DeleteCategory :execrows
 DELETE FROM categories
 WHERE id = $1 AND user_id = $2;

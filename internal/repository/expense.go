@@ -171,11 +171,19 @@ func (r *ExpenseRepository) Delete(ctx context.Context, userID, expenseID string
 	eid := pgtype.UUID{}
 	eid.Scan(expenseID)
 
-	err := r.queries.DeleteExpense(ctx, db.DeleteExpenseParams{
+	tag, err := r.queries.DeleteExpense(ctx, db.DeleteExpenseParams{
 		ID:     eid,
 		UserID: uid,
 	})
-	return MapError(err)
+	if err != nil {
+		return MapError(err)
+	}
+
+	if tag == 0 {
+		return domain.ErrNotFound
+	}
+
+	return nil
 }
 
 func (r *ExpenseRepository) GetSummaryByUserID(ctx context.Context, userID string, filter domain.ExpenseSummaryFilter) ([]db.GetExpenseSummaryByUserIDRow, error) {

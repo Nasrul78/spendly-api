@@ -53,12 +53,12 @@ func (s *AuthService) Register(ctx context.Context, req *domain.RegisterRequest)
 func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.AuthResponse, error) {
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		return nil, domain.ErrNotFound
+		return nil, domain.ErrUnauthorized
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, domain.ErrNotFound
+		return nil, domain.ErrUnauthorized
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

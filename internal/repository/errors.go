@@ -19,9 +19,11 @@ func MapError(err error) error {
 
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		// 23505 = unique_violation
-		if pgErr.Code == "23505" {
-			return domain.ErrConflict
+		switch pgErr.Code {
+		case "23503":
+			return domain.ErrNotFound // 23503 = foreign_key_violation
+		case "23505":
+			return domain.ErrConflict // 23505 = unique_violation
 		}
 	}
 

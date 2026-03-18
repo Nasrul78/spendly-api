@@ -74,7 +74,7 @@ func (q *Queries) CreateExpense(ctx context.Context, arg CreateExpenseParams) (E
 	return i, err
 }
 
-const deleteExpense = `-- name: DeleteExpense :exec
+const deleteExpense = `-- name: DeleteExpense :execrows
 DELETE FROM expenses
 WHERE id = $1 AND user_id = $2
 `
@@ -84,9 +84,12 @@ type DeleteExpenseParams struct {
 	UserID pgtype.UUID
 }
 
-func (q *Queries) DeleteExpense(ctx context.Context, arg DeleteExpenseParams) error {
-	_, err := q.db.Exec(ctx, deleteExpense, arg.ID, arg.UserID)
-	return err
+func (q *Queries) DeleteExpense(ctx context.Context, arg DeleteExpenseParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteExpense, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const getExpenseByID = `-- name: GetExpenseByID :one

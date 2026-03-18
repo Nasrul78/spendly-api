@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/nasrul78/spendly-api/internal/domain"
@@ -17,6 +18,11 @@ func NewExpenseService(expenseRepo *repository.ExpenseRepository) *ExpenseServic
 }
 
 func (s *ExpenseService) Create(ctx context.Context, userID string, req *domain.CreateExpenseRequest) (*domain.Expense, error) {
+	_, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		return nil, domain.ErrInvalidDate
+	}
+
 	expense, err := s.expenseRepo.Create(ctx, userID, req.CategoryID, req.Amount, req.Note, req.Date)
 	if err != nil {
 		return nil, err

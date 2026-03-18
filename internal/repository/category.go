@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nasrul78/spendly-api/internal/db"
+	"github.com/nasrul78/spendly-api/internal/domain"
 )
 
 type CategoryRepository struct {
@@ -83,9 +84,17 @@ func (r *CategoryRepository) Delete(ctx context.Context, userID, categoryID stri
 	cid := pgtype.UUID{}
 	cid.Scan(categoryID)
 
-	err := r.queries.DeleteCategory(ctx, db.DeleteCategoryParams{
+	tag, err := r.queries.DeleteCategory(ctx, db.DeleteCategoryParams{
 		ID:     cid,
 		UserID: uid,
 	})
-	return MapError(err)
+	if err != nil {
+		return MapError(err)
+	}
+
+	if tag == 0 {
+		return domain.ErrNotFound
+	}
+
+	return nil
 }

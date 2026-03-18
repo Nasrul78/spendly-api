@@ -33,7 +33,7 @@ SET category_id = $1, amount = $2, note = $3, date = $4, updated_at = NOW()
 WHERE id = $5 AND user_id = $6
 RETURNING *;
 
--- name: DeleteExpense :exec
+-- name: DeleteExpense :execrows
 DELETE FROM expenses
 WHERE id = $1 AND user_id = $2;
 
