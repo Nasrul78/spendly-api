@@ -18,9 +18,11 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/jackc/pgx/v5/pgxpool"
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -74,8 +76,10 @@ func main() {
 
 	// router
 	r := chi.NewRouter()
-	r.Use(chiMiddleware.Logger)
+
 	r.Use(chiMiddleware.Recoverer)
+	r.Use(middleware.Logger)
+	r.Use(httprate.LimitByIP(100, time.Minute))
 
 	r.Get("/health", healthHandler.Health)
 	r.Get("/ready", healthHandler.Ready)
@@ -84,6 +88,8 @@ func main() {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
+			r.Use(httprate.LimitByIP(10, time.Minute))
+
 			r.Post("/register", authHandler.Register)
 			r.Post("/login", authHandler.Login)
 		})
