@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -17,6 +18,9 @@ import (
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	cfg := config.Load()
 
 	dsn := fmt.Sprintf(
@@ -26,27 +30,33 @@ func main() {
 
 	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", "error", err)
+		os.Exit(1)
 	}
 	defer pool.Close()
 
 	if err := pool.Ping(context.Background()); err != nil {
-		log.Fatalf("failed to reach database: %v", err)
+		slog.Error("failed to reach database", "error", err)
+		os.Exit(1)
 	}
-	log.Println("successfully connected to database")
+	slog.Info("successfully connected to database")
 
+	// repositories
 	userRepo := repository.NewUserRepository(pool)
 	categoryRepo := repository.NewCategoryRepository(pool)
 	expenseRepo := repository.NewExpenseRepository(pool)
 
+	// services
 	authService := service.NewAuthService(userRepo, cfg)
 	categoryService := service.NewCategoryService(categoryRepo)
 	expenseService := service.NewExpenseService(expenseRepo)
 
+	// handlers
 	authHandler := handler.NewAuthHandler(authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	expenseHandler := handler.NewExpenseHandler(expenseService)
 
+	// router
 	r := chi.NewRouter()
 	r.Use(chimiddleware.Logger)
 	r.Use(chimiddleware.Recoverer)
@@ -80,8 +90,9 @@ func main() {
 	})
 
 	addr := ":" + cfg.AppPort
-	log.Printf("starting server on %s", addr)
+	slog.Info("starting server", "address", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		slog.Error("failed to start server", "error", err)
+		os.Exit(1)
 	}
 }

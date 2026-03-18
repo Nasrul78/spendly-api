@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/nasrul78/spendly-api/internal/domain"
@@ -23,20 +24,22 @@ func writeError(w http.ResponseWriter, status int, message string) {
 }
 
 func handleError(w http.ResponseWriter, err error) {
-	if errors.Is(err, domain.ErrNotFound) {
+	switch {
+	case errors.Is(err, domain.ErrNotFound):
 		writeError(w, http.StatusNotFound, err.Error())
 		return
-	}
-
-	if errors.Is(err, domain.ErrConflict) {
+	case errors.Is(err, domain.ErrConflict):
 		writeError(w, http.StatusConflict, err.Error())
 		return
-	}
-
-	if errors.Is(err, domain.ErrUnauthorized) {
+	case errors.Is(err, domain.ErrUnauthorized):
 		writeError(w, http.StatusUnauthorized, err.Error())
 		return
+	case errors.Is(err, domain.ErrInvalidDate):
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	default:
+		slog.Error("internal server error", "error", err)
+		writeError(w, http.StatusInternalServerError, "internal server error")
+		return
 	}
-
-	writeError(w, http.StatusInternalServerError, err.Error())
 }
