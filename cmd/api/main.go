@@ -70,11 +70,15 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	expenseHandler := handler.NewExpenseHandler(expenseService)
+	healthHandler := handler.NewHealthHandler(pool)
 
 	// router
 	r := chi.NewRouter()
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.Recoverer)
+
+	r.Get("/health", healthHandler.Health)
+	r.Get("/ready", healthHandler.Ready)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
