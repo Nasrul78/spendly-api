@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/nasrul78/spendly-api/internal/db"
@@ -19,8 +18,10 @@ func NewCategoryRepository(pool *pgxpool.Pool) *CategoryRepository {
 }
 
 func (r *CategoryRepository) Create(ctx context.Context, userID, name string) (*db.Category, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
+	}
 
 	category, err := r.queries.CreateCategory(ctx, db.CreateCategoryParams{
 		UserID: uid,
@@ -33,11 +34,15 @@ func (r *CategoryRepository) Create(ctx context.Context, userID, name string) (*
 }
 
 func (r *CategoryRepository) GetByID(ctx context.Context, userID, categoryID string) (*db.Category, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
+	}
 
-	cid := pgtype.UUID{}
-	cid.Scan(categoryID)
+	cid, err := parseUUID(categoryID)
+	if err != nil {
+		return nil, err
+	}
 
 	category, err := r.queries.GetCategoryByID(ctx, db.GetCategoryByIDParams{
 		UserID: uid,
@@ -50,8 +55,10 @@ func (r *CategoryRepository) GetByID(ctx context.Context, userID, categoryID str
 }
 
 func (r *CategoryRepository) GetAllByUserID(ctx context.Context, userID string) ([]db.Category, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
+	}
 
 	categories, err := r.queries.GetCategoriesByUserID(ctx, uid)
 	if err != nil {
@@ -61,11 +68,15 @@ func (r *CategoryRepository) GetAllByUserID(ctx context.Context, userID string) 
 }
 
 func (r *CategoryRepository) Update(ctx context.Context, userID, categoryID, name string) (*db.Category, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
+	}
 
-	cid := pgtype.UUID{}
-	cid.Scan(categoryID)
+	cid, err := parseUUID(categoryID)
+	if err != nil {
+		return nil, err
+	}
 
 	category, err := r.queries.UpdateCategory(ctx, db.UpdateCategoryParams{
 		Name:   name,
@@ -79,11 +90,15 @@ func (r *CategoryRepository) Update(ctx context.Context, userID, categoryID, nam
 }
 
 func (r *CategoryRepository) Delete(ctx context.Context, userID, categoryID string) error {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return err
+	}
 
-	cid := pgtype.UUID{}
-	cid.Scan(categoryID)
+	cid, err := parseUUID(categoryID)
+	if err != nil {
+		return err
+	}
 
 	tag, err := r.queries.DeleteCategory(ctx, db.DeleteCategoryParams{
 		ID:     cid,

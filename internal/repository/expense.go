@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/nasrul78/spendly-api/internal/db"
@@ -19,21 +18,25 @@ func NewExpenseRepository(pool *pgxpool.Pool) *ExpenseRepository {
 }
 
 func (r *ExpenseRepository) Create(ctx context.Context, userID string, categoryID *string, amount int64, note *string, date string) (*db.Expense, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	cid := pgtype.UUID{}
-	if categoryID != nil {
-		cid.Scan(*categoryID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	n := pgtype.Text{}
-	if note != nil {
-		n.Scan(*note)
+	cid, err := parseOptionalUUID(categoryID)
+	if err != nil {
+		return nil, err
 	}
 
-	d := pgtype.Date{}
-	d.Scan(date)
+	n, err := parseOptionalText(note)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := parseDate(date)
+	if err != nil {
+		return nil, err
+	}
 
 	expense, err := r.queries.CreateExpense(ctx, db.CreateExpenseParams{
 		UserID:     uid,
@@ -49,22 +52,24 @@ func (r *ExpenseRepository) Create(ctx context.Context, userID string, categoryI
 }
 
 func (r *ExpenseRepository) GetAllByUserID(ctx context.Context, userID string, filter domain.ExpenseFilter) ([]db.GetExpensesByUserIDRow, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	from := pgtype.Date{}
-	if filter.From != nil {
-		from.Scan(*filter.From)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	to := pgtype.Date{}
-	if filter.To != nil {
-		to.Scan(*filter.To)
+	from, err := parseOptionalDate(filter.From)
+	if err != nil {
+		return nil, err
 	}
 
-	cid := pgtype.UUID{}
-	if filter.CategoryID != nil {
-		cid.Scan(*filter.CategoryID)
+	to, err := parseOptionalDate(filter.To)
+	if err != nil {
+		return nil, err
+	}
+
+	cid, err := parseOptionalUUID(filter.CategoryID)
+	if err != nil {
+		return nil, err
 	}
 
 	offset := (filter.Page - 1) * filter.Limit
@@ -84,11 +89,15 @@ func (r *ExpenseRepository) GetAllByUserID(ctx context.Context, userID string, f
 }
 
 func (r *ExpenseRepository) GetByID(ctx context.Context, userID, expenseID string) (*db.GetExpenseByIDRow, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
+	}
 
-	eid := pgtype.UUID{}
-	eid.Scan(expenseID)
+	eid, err := parseUUID(expenseID)
+	if err != nil {
+		return nil, err
+	}
 
 	expense, err := r.queries.GetExpenseByID(ctx, db.GetExpenseByIDParams{
 		ID:     eid,
@@ -101,22 +110,24 @@ func (r *ExpenseRepository) GetByID(ctx context.Context, userID, expenseID strin
 }
 
 func (r *ExpenseRepository) CountAllByUserID(ctx context.Context, userID string, filter domain.ExpenseFilter) (int64, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	from := pgtype.Date{}
-	if filter.From != nil {
-		from.Scan(*filter.From)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return 0, err
 	}
 
-	to := pgtype.Date{}
-	if filter.To != nil {
-		to.Scan(*filter.To)
+	from, err := parseOptionalDate(filter.From)
+	if err != nil {
+		return 0, err
 	}
 
-	cid := pgtype.UUID{}
-	if filter.CategoryID != nil {
-		cid.Scan(*filter.CategoryID)
+	to, err := parseOptionalDate(filter.To)
+	if err != nil {
+		return 0, err
+	}
+
+	cid, err := parseOptionalUUID(filter.CategoryID)
+	if err != nil {
+		return 0, err
 	}
 
 	count, err := r.queries.CountExpensesByUserID(ctx, db.CountExpensesByUserIDParams{
@@ -132,24 +143,30 @@ func (r *ExpenseRepository) CountAllByUserID(ctx context.Context, userID string,
 }
 
 func (r *ExpenseRepository) Update(ctx context.Context, userID, expenseID string, categoryID *string, amount int64, note *string, date string) (*db.Expense, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	eid := pgtype.UUID{}
-	eid.Scan(expenseID)
-
-	cid := pgtype.UUID{}
-	if categoryID != nil {
-		cid.Scan(*categoryID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	n := pgtype.Text{}
-	if note != nil {
-		n.Scan(*note)
+	eid, err := parseUUID(expenseID)
+	if err != nil {
+		return nil, err
 	}
 
-	d := pgtype.Date{}
-	d.Scan(date)
+	cid, err := parseOptionalUUID(categoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	n, err := parseOptionalText(note)
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := parseDate(date)
+	if err != nil {
+		return nil, err
+	}
 
 	expense, err := r.queries.UpdateExpense(ctx, db.UpdateExpenseParams{
 		ID:         eid,
@@ -166,11 +183,15 @@ func (r *ExpenseRepository) Update(ctx context.Context, userID, expenseID string
 }
 
 func (r *ExpenseRepository) Delete(ctx context.Context, userID, expenseID string) error {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return err
+	}
 
-	eid := pgtype.UUID{}
-	eid.Scan(expenseID)
+	eid, err := parseUUID(expenseID)
+	if err != nil {
+		return err
+	}
 
 	tag, err := r.queries.DeleteExpense(ctx, db.DeleteExpenseParams{
 		ID:     eid,
@@ -188,17 +209,19 @@ func (r *ExpenseRepository) Delete(ctx context.Context, userID, expenseID string
 }
 
 func (r *ExpenseRepository) GetSummaryByUserID(ctx context.Context, userID string, filter domain.ExpenseSummaryFilter) ([]db.GetExpenseSummaryByUserIDRow, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	from := pgtype.Date{}
-	if filter.From != nil {
-		from.Scan(*filter.From)
+	uid, err := parseUUID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	to := pgtype.Date{}
-	if filter.To != nil {
-		to.Scan(*filter.To)
+	from, err := parseOptionalDate(filter.From)
+	if err != nil {
+		return nil, err
+	}
+
+	to, err := parseOptionalDate(filter.To)
+	if err != nil {
+		return nil, err
 	}
 
 	summary, err := r.queries.GetExpenseSummaryByUserID(ctx, db.GetExpenseSummaryByUserIDParams{
