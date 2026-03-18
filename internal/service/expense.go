@@ -49,38 +49,6 @@ func (s *ExpenseService) Create(ctx context.Context, userID string, req *domain.
 	return result, nil
 }
 
-func (s *ExpenseService) GetByID(ctx context.Context, userID, expenseID string) (*domain.Expense, error) {
-	expense, err := s.expenseRepo.GetByID(ctx, userID, expenseID)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &domain.Expense{
-		ID:        expense.ID.Bytes,
-		Amount:    expense.Amount,
-		Date:      expense.Date.Time,
-		CreatedAt: expense.CreatedAt.Time,
-		UpdatedAt: expense.UpdatedAt.Time,
-	}
-
-	if expense.CategoryID.Valid {
-		cid := uuid.UUID(expense.CategoryID.Bytes)
-		result.CategoryID = &cid
-	}
-
-	if expense.CategoryName.Valid {
-		cn := expense.CategoryName.String
-		result.CategoryName = &cn
-	}
-
-	if expense.Note.Valid {
-		n := expense.Note.String
-		result.Note = &n
-	}
-
-	return result, nil
-}
-
 func (s *ExpenseService) GetAllByUserID(ctx context.Context, userID string, filter domain.ExpenseFilter) (*domain.PaginatedExpenseResponse, error) {
 	if filter.Page == 0 {
 		filter.Page = 1
@@ -133,6 +101,38 @@ func (s *ExpenseService) GetAllByUserID(ctx context.Context, userID string, filt
 		Total: count,
 		Page:  filter.Page,
 		Limit: filter.Limit,
+	}
+
+	return result, nil
+}
+
+func (s *ExpenseService) GetByID(ctx context.Context, userID, expenseID string) (*domain.Expense, error) {
+	expense, err := s.expenseRepo.GetByID(ctx, userID, expenseID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &domain.Expense{
+		ID:        expense.ID.Bytes,
+		Amount:    expense.Amount,
+		Date:      expense.Date.Time,
+		CreatedAt: expense.CreatedAt.Time,
+		UpdatedAt: expense.UpdatedAt.Time,
+	}
+
+	if expense.CategoryID.Valid {
+		cid := uuid.UUID(expense.CategoryID.Bytes)
+		result.CategoryID = &cid
+	}
+
+	if expense.CategoryName.Valid {
+		cn := expense.CategoryName.String
+		result.CategoryName = &cn
+	}
+
+	if expense.Note.Valid {
+		n := expense.Note.String
+		result.Note = &n
 	}
 
 	return result, nil

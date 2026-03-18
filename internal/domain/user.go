@@ -33,6 +33,6 @@ type RegisterResponse struct {
 	Token string `json:"token"`
 }
 
-type AuthResponse struct {
+type LoginResponse struct {
 	Token string `json:"token"`
 }

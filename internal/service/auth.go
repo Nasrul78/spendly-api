@@ -50,7 +50,7 @@ func (s *AuthService) Register(ctx context.Context, req *domain.RegisterRequest)
 	}, nil
 }
 
-func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.AuthResponse, error) {
+func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.LoginResponse, error) {
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, domain.ErrUnauthorized
@@ -71,7 +71,7 @@ func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*dom
 		return nil, err
 	}
 
-	return &domain.AuthResponse{
+	return &domain.LoginResponse{
 		Token: signed,
 	}, nil
 }

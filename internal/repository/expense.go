@@ -47,23 +47,6 @@ func (r *ExpenseRepository) Create(ctx context.Context, userID string, categoryI
 	return &expense, nil
 }
 
-func (r *ExpenseRepository) GetByID(ctx context.Context, userID, expenseID string) (*db.GetExpenseByIDRow, error) {
-	uid := pgtype.UUID{}
-	uid.Scan(userID)
-
-	eid := pgtype.UUID{}
-	eid.Scan(expenseID)
-
-	expense, err := r.queries.GetExpenseByID(ctx, db.GetExpenseByIDParams{
-		ID:     eid,
-		UserID: uid,
-	})
-	if err != nil {
-		return nil, MapError(err)
-	}
-	return &expense, nil
-}
-
 func (r *ExpenseRepository) GetAllByUserID(ctx context.Context, userID string, filter domain.ExpenseFilter) ([]db.GetExpensesByUserIDRow, error) {
 	uid := pgtype.UUID{}
 	uid.Scan(userID)
@@ -97,6 +80,23 @@ func (r *ExpenseRepository) GetAllByUserID(ctx context.Context, userID string, f
 		return nil, MapError(err)
 	}
 	return expenses, nil
+}
+
+func (r *ExpenseRepository) GetByID(ctx context.Context, userID, expenseID string) (*db.GetExpenseByIDRow, error) {
+	uid := pgtype.UUID{}
+	uid.Scan(userID)
+
+	eid := pgtype.UUID{}
+	eid.Scan(expenseID)
+
+	expense, err := r.queries.GetExpenseByID(ctx, db.GetExpenseByIDParams{
+		ID:     eid,
+		UserID: uid,
+	})
+	if err != nil {
+		return nil, MapError(err)
+	}
+	return &expense, nil
 }
 
 func (r *ExpenseRepository) CountAllByUserID(ctx context.Context, userID string, filter domain.ExpenseFilter) (int64, error) {
