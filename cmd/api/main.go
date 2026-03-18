@@ -1,3 +1,15 @@
+// @title           Spendly API
+// @version         1.0
+// @description     A personal expense tracking REST API.
+
+// @host            localhost:8080
+// @BasePath        /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and your JWT token.
+
 package main
 
 import (
@@ -8,13 +20,14 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nasrul78/spendly-api/config"
 	"github.com/nasrul78/spendly-api/internal/handler"
 	"github.com/nasrul78/spendly-api/internal/middleware"
 	"github.com/nasrul78/spendly-api/internal/repository"
 	"github.com/nasrul78/spendly-api/internal/service"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -58,8 +71,10 @@ func main() {
 
 	// router
 	r := chi.NewRouter()
-	r.Use(chimiddleware.Logger)
-	r.Use(chimiddleware.Recoverer)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {

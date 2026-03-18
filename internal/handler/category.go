@@ -24,6 +24,18 @@ func NewCategoryHandler(categoryService *service.CategoryService) *CategoryHandl
 	}
 }
 
+// Create godoc
+// @Summary      Create a category
+// @Tags         categories
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body domain.CreateCategoryRequest true "Create category request"
+// @Success      201 {object} domain.Category
+// @Failure      400 {object} handler.errorResponse
+// @Failure      401 {object} handler.errorResponse
+// @Failure      409 {object} handler.errorResponse
+// @Router       /categories [post]
 func (h *CategoryHandler) Create(w http.ResponseWriter, r *http.Request) {
 	UserID := r.Context().Value(middleware.UserIDKey).(string)
 
@@ -47,6 +59,14 @@ func (h *CategoryHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, category)
 }
 
+// GetAll godoc
+// @Summary      Get all categories
+// @Tags         categories
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {array}  domain.Category
+// @Failure      401 {object} handler.errorResponse
+// @Router       /categories [get]
 func (h *CategoryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	UserID := r.Context().Value(middleware.UserIDKey).(string)
 
@@ -59,6 +79,16 @@ func (h *CategoryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, categories)
 }
 
+// GetByID godoc
+// @Summary      Get a category by ID
+// @Tags         categories
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path string true "Category ID"
+// @Success      200 {object} domain.Category
+// @Failure      401 {object} handler.errorResponse
+// @Failure      404 {object} handler.errorResponse
+// @Router       /categories/{id} [get]
 func (h *CategoryHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	UserID := r.Context().Value(middleware.UserIDKey).(string)
 	categoryID := chi.URLParam(r, "id")
@@ -72,6 +102,19 @@ func (h *CategoryHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, category)
 }
 
+// Update godoc
+// @Summary      Update a category
+// @Tags         categories
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path     string true "Category ID"
+// @Param        request body domain.UpdateCategoryRequest true "Update category request"
+// @Success      200 {object} domain.Category
+// @Failure      400 {object} handler.errorResponse
+// @Failure      401 {object} handler.errorResponse
+// @Failure      404 {object} handler.errorResponse
+// @Router       /categories/{id} [put]
 func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) {
 	UserID := r.Context().Value(middleware.UserIDKey).(string)
 	categoryID := chi.URLParam(r, "id")
@@ -96,6 +139,15 @@ func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, category)
 }
 
+// Delete godoc
+// @Summary      Delete a category
+// @Tags         categories
+// @Security     BearerAuth
+// @Param        id path string true "Category ID"
+// @Success      204
+// @Failure      401 {object} handler.errorResponse
+// @Failure      404 {object} handler.errorResponse
+// @Router       /categories/{id} [delete]
 func (h *CategoryHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	UserID := r.Context().Value(middleware.UserIDKey).(string)
 	categoryID := chi.URLParam(r, "id")
