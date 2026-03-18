@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/nasrul78/spendly-api/internal/domain"
 )
 

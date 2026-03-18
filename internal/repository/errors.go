@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+
 	"github.com/nasrul78/spendly-api/internal/domain"
 )
 

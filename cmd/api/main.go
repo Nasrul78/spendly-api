@@ -1,14 +1,14 @@
-// @title           Spendly API
-// @version         1.0
-// @description     A personal expense tracking REST API.
+//	@title			Spendly API
+//	@version		1.0
+//	@description	A personal expense tracking REST API.
 
-// @host            localhost:8080
-// @BasePath        /api/v1
+//	@host		localhost:8080
+//	@BasePath	/api/v1
 
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-// @description Type "Bearer" followed by a space and your JWT token.
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Type Bearer followed by a space and your JWT token.
 
 package main
 
@@ -22,12 +22,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"github.com/nasrul78/spendly-api/config"
+	_ "github.com/nasrul78/spendly-api/docs"
 	"github.com/nasrul78/spendly-api/internal/handler"
 	"github.com/nasrul78/spendly-api/internal/middleware"
 	"github.com/nasrul78/spendly-api/internal/repository"
 	"github.com/nasrul78/spendly-api/internal/service"
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+
 	"github.com/nasrul78/spendly-api/internal/domain"
 	"github.com/nasrul78/spendly-api/internal/middleware"
 	"github.com/nasrul78/spendly-api/internal/service"
@@ -25,16 +26,17 @@ func NewExpenseHandler(expenseService *service.ExpenseService) *ExpenseHandler {
 }
 
 // Create godoc
-// @Summary      Create an expense
-// @Tags         expenses
-// @Accept       json
-// @Produce      json
-// @Security     BearerAuth
-// @Param        request body domain.CreateExpenseRequest true "Create expense request"
-// @Success      201 {object} domain.Expense
-// @Failure      400 {object} handler.errorResponse
-// @Failure      401 {object} handler.errorResponse
-// @Router       /expenses [post]
+//
+//	@Summary	Create an expense
+//	@Tags		expenses
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		request	body		domain.CreateExpenseRequest	true	"Create expense request"
+//	@Success	201		{object}	domain.Expense
+//	@Failure	400		{object}	handler.errorResponse
+//	@Failure	401		{object}	handler.errorResponse
+//	@Router		/expenses [post]
 func (h *ExpenseHandler) Create(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 
@@ -59,18 +61,19 @@ func (h *ExpenseHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAll godoc
-// @Summary      Get all expenses
-// @Tags         expenses
-// @Produce      json
-// @Security     BearerAuth
-// @Param        page        query    int    false "Page number"
-// @Param        limit       query    int    false "Items per page"
-// @Param        from        query    string false "Start date (YYYY-MM-DD)"
-// @Param        to          query    string false "End date (YYYY-MM-DD)"
-// @Param        category_id query    string false "Category ID"
-// @Success      200 {object} domain.PaginatedExpenseResponse
-// @Failure      401 {object} handler.errorResponse
-// @Router       /expenses [get]
+//
+//	@Summary	Get all expenses
+//	@Tags		expenses
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		page		query		int		false	"Page number"
+//	@Param		limit		query		int		false	"Items per page"
+//	@Param		from		query		string	false	"Start date (YYYY-MM-DD)"
+//	@Param		to			query		string	false	"End date (YYYY-MM-DD)"
+//	@Param		category_id	query		string	false	"Category ID"
+//	@Success	200			{object}	domain.PaginatedExpenseResponse
+//	@Failure	401			{object}	handler.errorResponse
+//	@Router		/expenses [get]
 func (h *ExpenseHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	q := r.URL.Query()
@@ -103,15 +106,16 @@ func (h *ExpenseHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetByID godoc
-// @Summary      Get expense by ID
-// @Tags         expenses
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id  path     string true "Expense ID"
-// @Success      200 {object} domain.Expense
-// @Failure      401 {object} handler.errorResponse
-// @Failure      404 {object} handler.errorResponse
-// @Router       /expenses/{id} [get]
+//
+//	@Summary	Get expense by ID
+//	@Tags		expenses
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"Expense ID"
+//	@Success	200	{object}	domain.Expense
+//	@Failure	401	{object}	handler.errorResponse
+//	@Failure	404	{object}	handler.errorResponse
+//	@Router		/expenses/{id} [get]
 func (h *ExpenseHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	expenseID := chi.URLParam(r, "id")
@@ -126,18 +130,19 @@ func (h *ExpenseHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update godoc
-// @Summary      Update an expense
-// @Tags         expenses
-// @Accept       json
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id      path     string true "Expense ID"
-// @Param        request body     domain.UpdateExpenseRequest true "Update expense request"
-// @Success      200 {object} domain.Expense
-// @Failure      400 {object} handler.errorResponse
-// @Failure      401 {object} handler.errorResponse
-// @Failure      404 {object} handler.errorResponse
-// @Router       /expenses/{id} [put]
+//
+//	@Summary	Update an expense
+//	@Tags		expenses
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		id		path		string						true	"Expense ID"
+//	@Param		request	body		domain.UpdateExpenseRequest	true	"Update expense request"
+//	@Success	200		{object}	domain.Expense
+//	@Failure	400		{object}	handler.errorResponse
+//	@Failure	401		{object}	handler.errorResponse
+//	@Failure	404		{object}	handler.errorResponse
+//	@Router		/expenses/{id} [put]
 func (h *ExpenseHandler) Update(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	expenseID := chi.URLParam(r, "id")
@@ -163,14 +168,15 @@ func (h *ExpenseHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete godoc
-// @Summary      Delete an expense
-// @Tags         expenses
-// @Security     BearerAuth
-// @Param        id  path     string true "Expense ID"
-// @Success      204
-// @Failure      401 {object} handler.errorResponse
-// @Failure      404 {object} handler.errorResponse
-// @Router       /expenses/{id} [delete]
+//
+//	@Summary	Delete an expense
+//	@Tags		expenses
+//	@Security	BearerAuth
+//	@Param		id	path	string	true	"Expense ID"
+//	@Success	204
+//	@Failure	401	{object}	handler.errorResponse
+//	@Failure	404	{object}	handler.errorResponse
+//	@Router		/expenses/{id} [delete]
 func (h *ExpenseHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	expenseID := chi.URLParam(r, "id")
@@ -184,15 +190,16 @@ func (h *ExpenseHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetSummary godoc
-// @Summary      Get expense summary by category
-// @Tags         expenses
-// @Produce      json
-// @Security     BearerAuth
-// @Param        from query string false "Start date (YYYY-MM-DD)"
-// @Param        to   query string false "End date (YYYY-MM-DD)"
-// @Success      200 {object} domain.ExpenseSummaryResponse
-// @Failure      401 {object} handler.errorResponse
-// @Router       /expenses/summary [get]
+//
+//	@Summary	Get expense summary by category
+//	@Tags		expenses
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		from	query		string	false	"Start date (YYYY-MM-DD)"
+//	@Param		to		query		string	false	"End date (YYYY-MM-DD)"
+//	@Success	200		{object}	domain.ExpenseSummaryResponse
+//	@Failure	401		{object}	handler.errorResponse
+//	@Router		/expenses/summary [get]
 func (h *ExpenseHandler) GetSummaryByUserID(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(string)
 	q := r.URL.Query()
